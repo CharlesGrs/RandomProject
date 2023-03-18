@@ -53,6 +53,7 @@ Shader "Unlit/EnvironmentShader"
             float _heightNoiseFrequency;
             float _heightNoiseOffset;
 
+            float _humidityNoiseOffset;
             float _humidityNoiseFrequency;
             int _plantsAmount;
 
@@ -118,9 +119,8 @@ Shader "Unlit/EnvironmentShader"
 
             float GetHumidityMask(float3 posWS)
             {
-                float offset = 10000;
-                float n0 = snoise(posWS * _humidityNoiseFrequency + offset);
-                float n1 = snoise(posWS * _humidityNoiseFrequency * 5 + offset);
+                float n0 = snoise(posWS * _humidityNoiseFrequency + _humidityNoiseOffset);
+                float n1 = snoise(posWS * _humidityNoiseFrequency * 5 + _humidityNoiseOffset);
 
                 float mask = n0 * 0.9f + n1 * 0.1f;
 

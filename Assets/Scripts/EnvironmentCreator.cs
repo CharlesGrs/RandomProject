@@ -18,6 +18,7 @@ public class EnvironmentCreator : MonoBehaviour
     private int _plantsAmount;
 
     public float humidityNoiseFrequency;
+    public float humidityNoiseOffset;
     public float heightNoiseFrequency;
     public float heightNoiseStrength;
     public float heightNoiseOffset;
@@ -82,11 +83,13 @@ public class EnvironmentCreator : MonoBehaviour
         environmentMaterial.SetInt("_atlasHeight",AtlasTexture.height);
         environmentMaterial.SetInt("_plantsAmount",_plantsAmount);
         environmentMaterial.SetFloat("_humidityNoiseFrequency",humidityNoiseFrequency);
+        environmentMaterial.SetFloat("_humidityNoiseOffset",humidityNoiseOffset);
         
         environmentMaterial.SetFloat("_heightNoiseFrequency",heightNoiseFrequency);
         environmentMaterial.SetFloat("_heightNoiseStrength",heightNoiseStrength);
         environmentMaterial.SetFloat("_heightNoiseOffset",heightNoiseOffset);
         
+        groundMaterial.SetFloat("_humidityNoiseOffset",humidityNoiseOffset);
         groundMaterial.SetFloat("_humidityNoiseFrequency",humidityNoiseFrequency);
         groundMaterial.SetFloat("_heightNoiseFrequency",heightNoiseFrequency);
         groundMaterial.SetFloat("_heightNoiseStrength",heightNoiseStrength);

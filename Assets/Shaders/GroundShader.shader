@@ -2,8 +2,7 @@ Shader "Unlit/GroundShader"
 {
     Properties
     {
-        _NoiseFrequency("Noise Frequency", float) = 0.01
-        _NoiseStrength("Noise Strength", float) = 1
+        _MainCol("Main Color", color) = (0,0,0,0)
     }
     SubShader
     {
@@ -27,8 +26,11 @@ Shader "Unlit/GroundShader"
             float _heightNoiseStrength;
             float _heightNoiseFrequency;
             float _heightNoiseOffset;
-            
+
             float _humidityNoiseFrequency;
+            float _humidityNoiseOffset;
+
+            float4 _MainCol;
 
             struct appdata
             {
@@ -49,7 +51,7 @@ Shader "Unlit/GroundShader"
                 float n1 = snoise(posWS * _heightNoiseFrequency * 5 + _heightNoiseOffset);
 
                 float mask = n0 * 0.9f + n1 * 0.1f;
-                float uvZ = smoothstep(-PLANE_HALF_LENGTH,PLANE_HALF_LENGTH,posWS.z);
+                float uvZ = smoothstep(-PLANE_HALF_LENGTH,PLANE_HALF_LENGTH, posWS.z);
                 mask *= smoothstep(0.4f, 1.0f, uvZ);
 
 
@@ -58,9 +60,8 @@ Shader "Unlit/GroundShader"
 
             float GetHumidityMask(float3 posWS)
             {
-                float offset = 10000;
-                float n0 = snoise(posWS * _humidityNoiseFrequency + offset);
-                float n1 = snoise(posWS * _humidityNoiseFrequency * 5 + offset);
+                float n0 = snoise(posWS * _humidityNoiseFrequency + _humidityNoiseOffset);
+                float n1 = snoise(posWS * _humidityNoiseFrequency * 5 + _humidityNoiseOffset);
 
                 float mask = n0 * 0.9f + n1 * 0.1f;
 
@@ -86,6 +87,8 @@ Shader "Unlit/GroundShader"
             {
                 float humidityMask = GetHumidityMask(i.posWS);
                 float heightMask = GetHeightMask(i.posWS);
+
+                // return _MainCol;
 
                 return humidityMask;
 
