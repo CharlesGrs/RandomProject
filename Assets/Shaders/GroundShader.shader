@@ -82,8 +82,8 @@ Shader "Unlit/GroundShader"
                 float d = smoothstep(
                     .7, 1, 1 - distance(float3(posWS.x, 0, posWS.z), float3(_PlayerPosWS.x, 0, _PlayerPosWS.z)) * .0002);
                 v.vertex.y -= (1 - d) * 4000;
-                v.vertex.y += round(heightMask*2)/2 *2;
-                
+                // v.vertex.y += round(heightMask*2)/2 *2;
+                    
                 o.posWS = posWS;
                 o.vertex = TransformObjectToHClip(v.vertex);
                 o.uv = v.uv;

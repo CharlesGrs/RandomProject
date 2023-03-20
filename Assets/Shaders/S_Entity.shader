@@ -39,24 +39,33 @@ Shader "Unlit/S_Entity"
             float4 _MainTex_ST;
 
             float3 _PlayerPosWS;
+
             v2f vert(appdata v)
             {
                 v2f o;
                 o.uv = v.uv.xy;
 
                 o.posWS = TransformObjectToWorld(v.vertex);
-                float d = smoothstep(.7, 1,  1- distance(float2( o.posWS.x,  o.posWS.z), float2(_PlayerPosWS.x,  _PlayerPosWS.z)) * .0002);
-                v.vertex.y -= (1- d) *4000 ;
+                float d = smoothstep(
+                    .7, 1, 1 - distance(float2(o.posWS.x, o.posWS.z), float2(_PlayerPosWS.x, _PlayerPosWS.z)) * .0002);
 
                 //
-                // // billboard mesh towards camera
-                // float3 vpos = mul((float3x3)unity_ObjectToWorld, v.vertex.xyz);
-                // float4 worldCoord = float4(unity_ObjectToWorld._m03, unity_ObjectToWorld._m13, unity_ObjectToWorld._m23,
-                //                            1);
-                // float4 viewPos = mul(UNITY_MATRIX_V, worldCoord) + float4(vpos, 0);
-                // float4 outPos = mul(UNITY_MATRIX_P, viewPos);
+                // billboard mesh towards camera
+                float3 vpos = mul((float3x3)unity_ObjectToWorld, v.vertex.xyz);
+                float4 worldCoord = float4(unity_ObjectToWorld._m03, unity_ObjectToWorld._m13, unity_ObjectToWorld._m23,
+                                           1);
+                
+                float4 viewPos = mul(UNITY_MATRIX_V, worldCoord) + float4(vpos, 0);
+                
+                viewPos = float4(TransformViewToWorld(viewPos), viewPos.w);
+                viewPos.y -= (1 - d) * 4000;
+                viewPos = float4(TransformWorldToView(viewPos),viewPos.w);
 
-                o.pos = TransformObjectToHClip(v.vertex);
+                
+                float4 outPos = mul(UNITY_MATRIX_P, viewPos);
+
+
+                o.pos = outPos;
                 // o.pos = UnityObjectToClipPos(v.vertex);
                 return o;
             }

@@ -212,7 +212,7 @@ Shader "Unlit/EnvironmentShader"
                 float du = (float)width / _atlasWidth;
                 float dv = (float)height / _atlasHeight;
 
-                float4 col = tex2D(_AtlasTexture, i.uv * float2(du, dv) + float2(u, v));
+                float4 col = tex2Dlod(_AtlasTexture, float4(i.uv * float2(du, dv) + float2(u, v),0,0));
 
                 if (col.a < 0.7) discard;
                 return col;

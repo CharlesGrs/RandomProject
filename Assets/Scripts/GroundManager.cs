@@ -85,6 +85,7 @@ public class GroundManager : MonoBehaviour
         mesh.uv = uv;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
+        mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 10000);
         
         _meshFilter.mesh = mesh;
         _meshRenderer.material = PlaneData.PlaneMat;

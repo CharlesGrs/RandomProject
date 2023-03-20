@@ -24,11 +24,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _GrassTexture:
-        m_Texture: {fileID: 2800000, guid: 84a0082a671cb3642819cc69b89b9353, type: 3}
+        m_Texture: {fileID: 2800000, guid: 37c1e9a27bd81b34394f21e47a60898d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GroundTexture:
-        m_Texture: {fileID: 2800000, guid: c2e975e8a074dff45aee75e580a54344, type: 3}
+        m_Texture: {fileID: 2800000, guid: 1acd72c6baa7f814094ccf3696cab74a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
