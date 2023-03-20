@@ -3,6 +3,8 @@ Shader "Unlit/GroundShader"
     Properties
     {
         _MainCol("Main Color", color) = (0,0,0,0)
+        _GrassTexture("Grass Texture", 2D) = "white"
+        _GroundTexture("Ground Texture", 2D) = "white"
     }
     SubShader
     {
@@ -11,6 +13,7 @@ Shader "Unlit/GroundShader"
             "RenderType"="Opaque"
         }
 
+        Cull Off
         Pass
         {
             HLSLPROGRAM
@@ -51,11 +54,9 @@ Shader "Unlit/GroundShader"
                 float n1 = snoise(posWS * _heightNoiseFrequency * 5 + _heightNoiseOffset);
 
                 float mask = n0 * 0.9f + n1 * 0.1f;
-                float uvZ = smoothstep(-PLANE_HALF_LENGTH,PLANE_HALF_LENGTH, posWS.z);
-                mask *= smoothstep(0.4f, 1.0f, uvZ);
 
 
-                return saturate(mask) * _heightNoiseStrength;
+                return mask * _heightNoiseStrength;
             }
 
             float GetHumidityMask(float3 posWS)
@@ -68,29 +69,40 @@ Shader "Unlit/GroundShader"
                 return saturate(mask);
             }
 
+
+            float3 _PlayerPosWS;
+
             v2f vert(appdata v)
             {
+                v2f o;
                 float3 posWS = TransformObjectToWorld(v.vertex);
                 float heightMask = GetHeightMask(posWS);
 
-                v.vertex.y += heightMask;
-                // posWS.y += heightMask;
 
-                v2f o;
-                o.vertex = TransformObjectToHClip(v.vertex);
+                float d = smoothstep(
+                    .7, 1, 1 - distance(float3(posWS.x, 0, posWS.z), float3(_PlayerPosWS.x, 0, _PlayerPosWS.z)) * .0002);
+                v.vertex.y -= (1 - d) * 4000;
+                v.vertex.y += round(heightMask*2)/2 *2;
+                
                 o.posWS = posWS;
+                o.vertex = TransformObjectToHClip(v.vertex);
                 o.uv = v.uv;
                 return o;
             }
+
+            sampler2D _GrassTexture, _GroundTexture;
 
             float4 frag(v2f i) : SV_Target
             {
                 float humidityMask = GetHumidityMask(i.posWS);
                 float heightMask = GetHeightMask(i.posWS);
 
+                float scale = 0.1;
+                float4 grass = tex2D(_GrassTexture, i.posWS.xz*scale);
+                float4 ground = tex2D(_GroundTexture, i.posWS.xz*scale);
                 // return _MainCol;
 
-                return humidityMask;
+                return lerp(ground, grass, humidityMask);
 
                 return heightMask / _heightNoiseStrength;
             }

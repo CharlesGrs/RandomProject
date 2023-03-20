@@ -41,8 +41,8 @@ Shader "Unlit/EnvironmentShader"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "noiseSimplex.cginc"
 
-            #define PLANE_HALF_WIDTH 25.0f
-            #define PLANE_HALF_LENGTH 12.5f
+            #define PLANE_HALF_WIDTH 50.0f
+            #define PLANE_HALF_LENGTH 50.0f
 
             sampler2D _AtlasTexture;
             StructuredBuffer<int4> _AtlasDataBuffer;
@@ -114,7 +114,7 @@ Shader "Unlit/EnvironmentShader"
                 mask *= smoothstep(0.4f, 1.0f, uvZ);
 
 
-                return saturate(mask) * _heightNoiseStrength;
+                return mask * _heightNoiseStrength;
             }
 
             float GetHumidityMask(float3 posWS)
@@ -127,6 +127,8 @@ Shader "Unlit/EnvironmentShader"
                 return saturate(mask);
             }
 
+                        float3 _PlayerPosWS;
+
             v2f vert(appdata v)
             {
                 uint t_idx = v.vid / 3; // triangle Index 
@@ -135,13 +137,18 @@ Shader "Unlit/EnvironmentShader"
                 float instanceId = v.vid / 6;
                 int idx = t_idx % 2 == 0 ? v_idx : v_idx + 3;
 
-                float2 planeScale = float2(25.0f, 12.5f);
+                float2 planeScale = float2(100.0f,100.0f);
                 float2 randomPos = (hash21(instanceId * 0.1) - .5) * 2; //-1 to 1
                 float3 pos = float3(randomPos.x * planeScale.x, 0, randomPos.y * planeScale.y);
                 float3 posWS = mul(unity_ObjectToWorld, pos);
 
                 float heightMask = GetHeightMask(posWS);
-                pos.y += heightMask;
+                pos.y += round(heightMask*2)/2 *2;
+
+                 float d = smoothstep(
+                    .7, 1, 1 - distance(float3(posWS.x, 0, posWS.z), float3(_PlayerPosWS.x, 0, _PlayerPosWS.z)) * .0002);
+                pos.y -= (1 - d) * 4000;
+                
 
                 posWS = mul(unity_ObjectToWorld, pos);
 
@@ -172,7 +179,7 @@ Shader "Unlit/EnvironmentShader"
                 float rand = hash11(instanceId * 0.1);
 
                 //Discard a vertices by sending it behing camera
-                v.vertex.xyz = rand > humidity * 1.f ? float3(0, 0, -100) : v.vertex.xyz;
+                // v.vertex.xyz = rand > humidity * 1.f ? float3(0, 0, -100) : v.vertex.xyz;
 
                 v2f o;
                 o.uv = UVs[idx];
